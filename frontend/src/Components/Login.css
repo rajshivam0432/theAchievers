@@ -1,12 +1,14 @@
-css
-Copy code
-.container {
+
+.login-container {
   max-width: 400px;
-  margin: 50px auto;
+ margin:auto;
+ margin-top:4%;
+  width:60%;
+  color:white;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  /* border: 1px solid #ccc;
+  border-radius: 5px; */
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
   text-align: center; /* Center the content */
 }
 
@@ -22,13 +24,17 @@ Copy code
 
 .ui.form {
   display: flex;
+  margin-top: 0.5%;
+  
   flex-direction: column;
 }
 
 .field {
   margin-bottom: 20px;
-  width: 50%;
-margin-left: 400px;
+  width: 100%;
+  margin:auto;
+  margin-top:1%;
+
   
   justify-content: center;
 }
@@ -42,24 +48,36 @@ label {
 input {
  
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid rgb(200,100,255);
   border-radius: 4px;
+  margin-top:1%;
   box-sizing: border-box;
   width: 100%; /* Set the width to 100% or adjust as needed */
  
   text-align: center;
 }
 
-p {
-  color: red;
-  margin: 0;
+
+.p {
+  margin-top:20%;
+  color: rgb(255,255,255);
+  
+  
+
+  /* margin-top:0%; */
+  
 }
 
-button {
+.login-button {
   background-color: #2185d0;
-  color: #fff;
+  color: #0ae728;
+
   padding: 10px;
+ 
+  margin-top:1%;
   border: none;
+margin-left:15%;
+width:70%;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -67,4 +85,9 @@ button {
 
 button:hover {
   background-color: #1678c2;
+}
+.h1{
+  margin-top: 15%;
+  color:white;
+margin-left: 2%;
 }

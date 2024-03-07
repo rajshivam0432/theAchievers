@@ -92,8 +92,8 @@ const Popup = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 20px;
-  background:red;
-  border-radius: 5px;
+  background:slateblue;
+  border-radius: 50px;
   textColor:orange;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
@@ -110,7 +110,7 @@ function Feedback() {
 
   const handleSubmit = () => {
     setShowPopup(true);
-  };
+      };
 
   const getGreeting = () => {
     if (rating > 3) {

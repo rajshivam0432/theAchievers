@@ -1,50 +1,80 @@
-import './App.css' 
-import Accounts from './pages/Accounts'
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/Login.jsx"
-import Header from "./components/Header.jsx";
-import Home from "./components/Home.jsx"
-import Rebate from './components/Rebate.jsx';
+// Import necessary dependencies
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login.jsx';
+import PropTypes from 'prop-types'; 
+import Header from './components/Header.jsx';
+import Home from './components/Home.jsx';
+import Accounts from './pages/Accounts';
+import SignUp from './components/SignUp';
+import Feedback from './components/Feedback';
+import ExtraItems from './components/Extras.jsx';
 import ComplaintPage from './pages/Complaint/Complaint.jsx';
 import WeeklyMenu from './pages/MessMenu/MessMenu.jsx';
-
-import SignUp from './components/SignUp'; // Import SignUp component
-import Feedback from './components/Feedback'; // Import SignUp component
-
-
-
+import Rebate from './components/Rebate.jsx';
 
 function App() {
+  const [authenticated, setAuthenticated] = useState(false);
+
+  
+
+  const ProtectedRoute = ({ element, ...rest }) => {
+    return authenticated ? (
+      element
+    ) : (
+      <Navigate to="/login" replace state={{ from: rest.location }} />
+    );
+  };
+  ProtectedRoute.propTypes = {
+    element: PropTypes.element.isRequired,
+  };
+
   const menuItems = [
-    { day: 'Monday', breakfast: 'paratha tea', lunch: 'Rice Paneer Salad', dinner: 'Rice Paneer Salad' },
-    { day: 'Tuesday', breakfast: 'paratha tea', lunch: 'Rice Paneer Salad Soup', dinner: 'Grilled Rice Paneer Salad' },
-    { day: 'Wednesday', breakfast: 'paratha tea', lunch: 'Sandwiches Rice Paneer Salad', dinner: 'Rice Paneer Salad' },
-    { day: 'Thursday', breakfast: 'paratha tea', lunch: 'Rice Paneer Salad', dinner: 'Stir-fry Rice Paneer Salad' },
-    { day: 'Friday', breakfast: 'paratha tea', lunch: 'Rice Paneer Salad', dinner: 'Stir-fry Rice Paneer Salad' },
-    { day: 'Saturday', breakfast: 'paratha tea', lunch: 'Rice Paneer Salad', dinner: 'Stir-fry Rice Paneer Salad' },
-    { day: 'Sunday', breakfast: 'paratha tea', lunch: 'Rice Paneer Salad', dinner: 'Stir-fry Rice Paneer Salad' },
-    // Add more items for the rest of the week...
+    // ... your menu items
   ];
+
   return (
-    <div className="App">
-      <Router>
-      <Header/>
+    // Wrap your entire application with the Router component
+    <Router>
+      <div className="App">
+        <Header />
         <Routes>
-          <Route path="/Login" element={<Login />} />
-          <Route path="/SignUp" element={<SignUp />} />
-          <Route path="/feedback" element={<Feedback />} />
-          <Route path="/Home" element={<Home />} />
-            <Route path="/" element={<Home/>}/>
-        <Route path="/mess-menu" element={<WeeklyMenu menuItems={menuItems} />}/> 
-         <Route path='/complaint' element={<ComplaintPage/>}/>
-
-        <Route path='/accounts' element={<Accounts/>}/>
-        <Route path='/rebate' element={<Rebate/>}/>
+          <Route
+            path="/login"
+            element={<Login setAuthenticated={setAuthenticated} />}
+          />
+          <Route path="/signup" element={<SignUp />} />
+          <Route
+            path="/Feedback"
+            element={<ProtectedRoute element={<Feedback.jsx />} />}
+          />
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/accounts"
+            element={<ProtectedRoute element={<Accounts />} />}
+          />
+          <Route
+            path="/mess-menu"
+            element={
+              <ProtectedRoute element={<WeeklyMenu menuItems={menuItems} />} />
+            }
+          />
+          <Route
+            path="/complaint"
+            element={<ProtectedRoute element={<ComplaintPage />} />}
+          />
+          <Route
+            path="/extras"
+            element={<ProtectedRoute element={<ExtraItems />} />}
+          />
+          <Route
+            path="/rebate"
+            element={<ProtectedRoute element={<Rebate />} />}
+          />
         </Routes>
-      </Router>
-    </div>
+      </div>
+    </Router>
   );
-
 }
 
 export default App;

@@ -8,7 +8,7 @@ const Header = (props) => {
         <img src="https://th.bing.com/th?id=OIP.EAq7n0NsBw4MpfHofHraXAHaF7&w=279&h=223&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2" alt="MessMate" />
       </Logo>
       <NavMenu>
-        <Link to="/home">
+        <Link to="/">
           <img src="/images/home-icon.svg" alt="HOME" />
           <span>HOME</span>
         </Link>
