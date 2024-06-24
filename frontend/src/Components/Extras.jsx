@@ -1,4 +1,3 @@
-// ExtraItems.jsx
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -15,13 +14,14 @@ const ExtraItemsContainer = styled.div`
 const DayDateContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 15px;
   color: #333;
 `;
 
 const DropdownContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-bottom: 15px;
 `;
 
@@ -84,6 +84,7 @@ const ConsumedItems = styled.div`
 const ConsumedItem = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 10px;
   border-bottom: 1px solid #ccc;
 `;
@@ -117,14 +118,21 @@ const ExtraItems = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
   const [itemQuantities, setItemQuantities] = useState({});
-  const [consumedItems, setConsumedItems] = useState([]);
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [consumedItemsByDate, setConsumedItemsByDate] = useState({});
+  const [totalAmountsByDate, setTotalAmountsByDate] = useState({});
   const [dateError, setDateError] = useState(false);
 
   const handleDateChange = (event) => {
     const selectedDate = event.target.value;
     setSelectedDate(selectedDate);
-    setConsumedItems([]); // Reset consumed items when date changes
+    setConsumedItemsByDate((prevConsumedItems) => ({
+      ...prevConsumedItems,
+      [selectedDate]: [],
+    }));
+    setTotalAmountsByDate((prevTotalAmounts) => ({
+      ...prevTotalAmounts,
+      [selectedDate]: 0,
+    }));
     setDateError(false);
   };
 
@@ -167,17 +175,23 @@ const ExtraItems = () => {
       return;
     }
 
-    setConsumedItems([...consumedItems, ...consumedItemsForDate]);
-    setTotalAmount((prevTotal) => {
-      const newTotal = consumedItemsForDate.reduce(
-        (total, item) => total + item.price * item.quantity,
-        prevTotal
-      );
-      return newTotal;
-    });
+    setConsumedItemsByDate((prevConsumedItems) => ({
+      ...prevConsumedItems,
+      [selectedDate]: consumedItemsForDate,
+    }));
+
+    const totalAmountForDate = consumedItemsForDate.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+
+    setTotalAmountsByDate((prevTotalAmounts) => ({
+      ...prevTotalAmounts,
+      [selectedDate]: totalAmountForDate,
+    }));
+
     setSelectedItems([]);
     setItemQuantities({});
-    setSelectedDate('');
     setDateError(false);
   };
 
@@ -186,12 +200,33 @@ const ExtraItems = () => {
       <h2 style={{ color: '#333' }}>Extra Items</h2>
       <DropdownContainer>
         <Dropdown onChange={handleDateChange} value={selectedDate} required>
-          <option value="" disabled>Select Date</option>
+          <option value="" disabled>
+            Select Date
+          </option>
           {getDatesForMonth().map((data) => (
             <option key={data.date} value={data.date}>{`${data.day}, ${data.date}`}</option>
           ))}
         </Dropdown>
+        <Button onClick={handleSubmit}>Submit</Button>
       </DropdownContainer>
+      {dateError && <div style={{ color: 'red' }}>Please select a date.</div>}
+      {selectedDate && (
+        <ConsumedItems>
+          <h3 style={{ color: '#333' }}>Consumed Items on {selectedDate}</h3>
+          {consumedItemsByDate[selectedDate]?.map((item, index) => (
+            <ConsumedItem key={index}>
+              <ItemInfo>
+                <ItemName>{item.name}</ItemName>
+                <ItemPrice>${(item.price * item.quantity).toFixed(2)}</ItemPrice>
+              </ItemInfo>
+              <span style={{ color: '#4caf50' }}>Qty: {item.quantity}</span>
+            </ConsumedItem>
+          ))}
+          <div>
+            <strong>Total Amount:</strong> ${totalAmountsByDate[selectedDate]?.toFixed(2)}
+          </div>
+        </ConsumedItems>
+      )}
       {extraItems.map((item) => (
         <ExtraItem key={item.id}>
           <ItemInfo>
@@ -212,30 +247,8 @@ const ExtraItems = () => {
           </Button>
         </ExtraItem>
       ))}
-      <DayDateContainer>
-             <Button onClick={handleSubmit}>Submit</Button>
-      </DayDateContainer>
-      {dateError && <div style={{ color: 'red' }}>Please select a date.</div>}
-      {selectedDate && (
-        <ConsumedItems>
-          <h3 style={{ color: '#333' }}>Consumed Items on {selectedDate}</h3>
-          {consumedItems.map((item) => (
-            <ConsumedItem key={item.id}>
-              <ItemInfo>
-                <ItemName>{item.name}</ItemName>
-                <ItemPrice>${(item.price * item.quantity).toFixed(2)}</ItemPrice>
-              </ItemInfo>
-              <span style={{ color: '#4caf50' }}>Qty: {item.quantity}</span>
-            </ConsumedItem>
-          ))}
-        </ConsumedItems>
-      )}
-      <div>
-        <strong>Total Amount:</strong> ${totalAmount.toFixed(2)}
-      </div>
     </ExtraItemsContainer>
   );
 };
 
 export default ExtraItems;
-

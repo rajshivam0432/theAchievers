@@ -1,10 +1,10 @@
 import { User } from "../models/user.model.js";
 import { Apierror } from "../utils/apierror.js";
-import { asyncHander } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 
 
-const verifyJWT=asyncHander(async(req,res,next)=>{
+const verifyJWT=asyncHandler(async(req,res,next)=>{
     try {
         const tokan=await req.cookies?.accessTokan || req.header("Authorization")?.replace("Bearer ","")
         if(!tokan){
@@ -17,7 +17,7 @@ const verifyJWT=asyncHander(async(req,res,next)=>{
             throw new Apierror(401,"Invalid Access Tokan")
         }
         req.user=user;
-         next()
+         next();
     } catch (error) {
         throw new Apierror(401,error?.message || "Inavlid access tokan")
     }

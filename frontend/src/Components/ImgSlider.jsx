@@ -1,6 +1,7 @@
+import React from "react";
 import styled from "styled-components";
-
 import Slider from "react-slick";
+import LazyLoad from "react-lazyload";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -18,33 +19,43 @@ const ImgSlider = (props) => {
   return (
     <Carousel {...settings}>
       <Wrap>
-        <a>
-          <img src="/images/dining.jpg" alt="" />
-        </a>
+        <LazyLoad height={200} offset={100} once>
+          <a>
+            <img src="/images/dining.jpg" alt="" />
+          </a>
+        </LazyLoad>
       </Wrap>
 
       <Wrap>
-        <a>
-          <img src="/images/mess-menu.jpg" alt="" />
-        </a>
+        <LazyLoad height={200} offset={100} once>
+          <a>
+            <img src="/images/mess-menu.jpg" alt="" />
+          </a>
+        </LazyLoad>
       </Wrap>
 
       <Wrap>
-        <a>
-          <img src="/images/rebates.jpg" alt="" />
-        </a>
+        <LazyLoad height={200} offset={100} once>
+          <a>
+            <img src="/images/rebates.jpg" alt="" />
+          </a>
+        </LazyLoad>
       </Wrap>
 
       <Wrap>
-        <a>
-          <img src="/images/billing.jpg" alt="" />
-        </a>
+        <LazyLoad height={200} offset={100} once>
+          <a>
+            <img src="/images/billing.jpg" alt="" />
+          </a>
+        </LazyLoad>
       </Wrap>
 
       <Wrap>
-        <a>
-          <img src="/images/complaints.jpg" alt="" />
-        </a>
+        <LazyLoad height={200} offset={100} once>
+          <a>
+            <img src="/images/complaints.jpg" alt="" />
+          </a>
+        </LazyLoad>
       </Wrap>
     </Carousel>
   );
@@ -54,7 +65,6 @@ const Carousel = styled(Slider)`
   width: 50%; /* Set the desired width */
   margin: 0 auto; /* Center the carousel */
   margin-top: 20px; /* Adjust margin-top as needed */
-  margin-top: 20px;
 
   & > button {
     opacity: 0;
@@ -97,6 +107,7 @@ const Wrap = styled.div`
   cursor: pointer;
   position: relative;
   padding: 0 16px; /* Adjust padding as needed */
+
   a {
     border-radius: 4px;
     box-shadow: rgb(0 0 0 / 69%) 0px 26px 30px -10px,
@@ -108,7 +119,7 @@ const Wrap = styled.div`
 
     img {
       width: 100%;
-      // height: 100%;
+      height: auto; /* Ensure the image scales correctly */
       object-fit: cover; /* Ensure the image covers the entire container */
       min-height: 460px; /* Set a minimum height as needed */
     }

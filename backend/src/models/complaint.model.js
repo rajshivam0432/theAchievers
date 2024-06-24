@@ -5,17 +5,22 @@ const complaintSchema=new Schema({
     type:String,
     required:true
    },
-   problem:{
+   complaint:{
     type:String,
     required:true
    },
-   media:{
-    type:String, 
-   },
+   
    complainter:{
     type:Schema.Types.ObjectId,
     ref:"User"
-   }
+   },
+   email: { type: String, required: true,unique:true},
+
+   hostelNumber:{
+    type:String,
+    required:true,
+   },
+
 },{timestamps:true})
 
 export const  Complaint=mongoose.model("Complaint",complaintSchema)

@@ -1,7 +1,7 @@
-// Feedback.jsx
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate for programmatic navigation
+import axios from 'axios';
 
 const enlargeShrinkAnimation = keyframes`
   0%, 100% {
@@ -15,31 +15,39 @@ const enlargeShrinkAnimation = keyframes`
 const FeedbackContainer = styled.div`
   height: 100vh;
   display: flex;
+  overflow: hidden;
 `;
 
 const BackgroundContainer = styled.div`
-  width: 58%;
-  background: url('/images/service-feedback2.jpg') no-repeat center center fixed;
+  width: 50%;
+  max-width: 100%;
+  background: url('path_to_your_background_image') center no-repeat; /* Replace with actual image path */
   background-size: cover;
 `;
 
 const ContentContainer = styled.div`
   width: 50%;
+  max-width: 50%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  position: relative;
+
+  @media screen and (max-width: 768px) {
+    width: 100%;
+    max-width: 100%;
+  }
 `;
 
 const FeedbackHeader = styled.h2`
   color: #fff;
   text-align: center;
   margin-bottom: 20px;
+  font-size: 22px;
 `;
 
 const StarContainer = styled.div`
@@ -83,7 +91,13 @@ const EnlargingLink = styled(Link)`
   color: #4caf50;
   margin-top: 20px;
   display: inline-block;
-  animation: ${enlargeShrinkAnimation} 3s infinite; /* Adjust the animation duration as needed */
+  animation: ${enlargeShrinkAnimation} 3s infinite;
+`;
+
+const PopupHeader = styled.h3`
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 10px;
 `;
 
 const Popup = styled.div`
@@ -91,26 +105,58 @@ const Popup = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: 400px;
+  height: 200px;
   padding: 20px;
-  background:slateblue;
-  border-radius: 50px;
-  textColor:orange;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: #003285;
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
 `;
 
 function Feedback() {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const navigate = useNavigate(); // Use useNavigate for programmatic navigation
 
   const handleStarClick = (star) => {
     setRating(star);
   };
 
-  const handleSubmit = () => {
-    setShowPopup(true);
-      };
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/feedback/create`,
+        { rating, feedbackMessage: feedback },
+        { withCredentials: true }
+      );
+
+      if (response.status === 201) {
+        setPopupMessage('Feedback submitted successfully!');
+        setShowPopup(true);
+        setRating(0);
+        setFeedback('');
+      } else {
+        setPopupMessage('Error submitting feedback. Please try again later.');
+        setShowPopup(true);
+      }
+    } catch (error) {
+      if (error.response) {
+        console.log("Response data:", error.response.data);
+      }
+      console.error('Error submitting feedback:', error.message);
+      setPopupMessage('Error submitting feedback. Please try again later.');
+      setShowPopup(true);
+    }
+  };
 
   const getGreeting = () => {
     if (rating > 3) {
@@ -118,6 +164,10 @@ function Feedback() {
     } else {
       return 'We appreciate your feedback.';
     }
+  };
+
+  const handleGetFeedback = () => {
+    navigate('/feedbacklist'); // Use navigate('/feedbacklist') to redirect to '/feedbacklist' route
   };
 
   return (
@@ -142,12 +192,13 @@ function Feedback() {
           onChange={(e) => setFeedback(e.target.value)}
         />
         <SubmitButton onClick={handleSubmit}>Submit</SubmitButton>
-        <EnlargingLink to="/home">Go to home</EnlargingLink>
+        <EnlargingLink to="/">Go to home</EnlargingLink>
+        <button onClick={handleGetFeedback}>Get Feedback</button>
       </ContentContainer>
       {showPopup && (
         <Popup>
-          <h3>Greeting Message</h3>
-          <p>{getGreeting()}</p>
+          <PopupHeader>Feedback Submission Status</PopupHeader>
+          <h4>{popupMessage}</h4>
           <button onClick={() => setShowPopup(false)}>Close</button>
         </Popup>
       )}

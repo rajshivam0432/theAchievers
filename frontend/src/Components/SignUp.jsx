@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "./Signup.css";
-import { Link } from "react-router-dom";
-import axios from "axios"
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { AuthContext } from "../contexts/Authcontext"; // Import the AuthContext
 
 function Signup() {
-  const hostels = ["H-1", "H-2", "H-3", "H-4", "H-5", "H-6", "H-7", "H-8", "H-9", "H-10", "H-11", "GH-KC", "GH-CB", "GH-BB"];
-
+  const hostels = [
+    "H-1", "H-2", "H-3", "H-4", "H-5", "H-6", "H-7", "H-8", "H-9", "H-10", "H-11",
+    "GH-KC", "GH-CB", "GH-BB"
+  ];
 
   const initialValues = {
     fullName: "",
@@ -18,54 +20,56 @@ function Signup() {
     mobileNumber: "",
     hostelNumber: "",
   };
+
   const [formValues, setFormValues] = useState(initialValues);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
-  const navigate=useNavigate()
+  const navigate = useNavigate();
+  // const { login } = useContext(AuthContext); // Use the login function from context
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
 
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormErrors(validate(formValues));
-    console.log(formValues)
-    try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-      const { data } = await axios.post(
-        "/api/v1/users/register",
-        {
-          fullName:formValues.fullName,
-          email:formValues.email,
-          rollNumber:formValues.rollNumber,
-          hostelNumber:formValues.hostelNumber,
-          mobileNumber:formValues.mobileNumber,
-          roomNumber:formValues.roomNumber,
-          password:formValues.password
-        },
-        config
-      );
-      console.log(data);
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      
-      navigate('/login');
-      setIsSubmit(true)
-  }catch(error){
-  console.log(error)
-  }
-}
-  useEffect(() => {
-    console.log(formErrors);
-    if (Object.keys(formErrors).length === 0 && isSubmit) {
-      console.log(formValues);
-      // You can add your signup logic here
+    const errors = validate(formValues);
+    setFormErrors(errors);
+    if (Object.keys(errors).length === 0) {
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+        const res = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/api/v1/users/register`,
+          {
+            fullName: formValues.fullName,
+            email: formValues.email,
+            rollNumber: formValues.rollNumber,
+            hostelNumber: formValues.hostelNumber,
+            mobileNumber: formValues.mobileNumber,
+            roomNumber: formValues.roomNumber,
+            password: formValues.password,
+          },
+          config
+        );
+
+        localStorage.setItem("token", res.data.token);
+        // login(res.data.token, res.data.isAdmin); // Use the login function to set the user data in context
+        navigate('/login');
+        setIsSubmit(true);
+      } catch (error) {
+        if (error.response) {
+          console.log("Response data:", error.response.data);
+        }
+        console.log(error);
+        setFormErrors({ apiError: "Signup failed. Please try again." });
+      }
     }
-  }, [formErrors]);
+  };
 
   const validate = (values) => {
     const errors = {};
@@ -111,17 +115,13 @@ function Signup() {
       errors.mobileNumber = "Mobile Number is required";
     }
 
-    if (!values.hostelNumber) {
-      errors.hostelNumber = "Hostel Number is required";
-    }
-
     return errors;
   };
 
   return (
     <div className="container">
       <form onSubmit={handleSubmit}>
-        <h1 className="heading-signup"> SIGNUP</h1>
+        <h1 className="heading-signup">SIGNUP</h1>
         <div className="left-right-signup-container">
           <div className="ui form-signup">
             <div className="field-signup">
@@ -146,8 +146,7 @@ function Signup() {
               <p>{formErrors.rollNumber}</p>
             </div>
             <div className="field-signup">
-              <select name="hostelNumber"value={formValues.hostelNumber}
-                onChange={handleChange}>
+              <select name="hostelNumber" value={formValues.hostelNumber} onChange={handleChange}>
                 <option value="" disabled>Select Hostel Number</option>
                 {hostels.map((hostel, index) => (
                   <option key={index} value={hostel}>{hostel}</option>
@@ -165,9 +164,8 @@ function Signup() {
               />
               <p>{formErrors.roomNumber}</p>
             </div>
-          
+
             <div className="field-signup">
-              {/* <label>Mobile Number</label> */}
               <input
                 type="text"
                 name="mobileNumber"
@@ -177,11 +175,9 @@ function Signup() {
               />
               <p>{formErrors.mobileNumber}</p>
             </div>
-            
           </div>
           <div className="ui form-signup">
             <div className="field-signup">
-              {/* <label>Email</label> */}
               <input
                 type="text"
                 name="email"
@@ -192,7 +188,6 @@ function Signup() {
               <p>{formErrors.email}</p>
             </div>
             <div className="field-signup">
-              {/* <label>Password</label> */}
               <input
                 type="password"
                 name="password"
@@ -203,7 +198,6 @@ function Signup() {
               <p>{formErrors.password}</p>
             </div>
             <div className="field-signup">
-              {/* <label>Confirm Password</label> */}
               <input
                 type="password"
                 name="confirmPassword"
@@ -213,8 +207,14 @@ function Signup() {
               />
               <p>{formErrors.confirmPassword}</p>
             </div>
-            <button className="fluid ui button-signup blue "><Link to="/login">LOG IN</Link></button>
+            <button type="submit" className="fluid ui button-signup blue">
+              SIGN UP
+            </button>
           </div>
+        </div>
+        <p>{formErrors.apiError}</p>
+        <div className="login-link">
+          <Link to="/login">LOG IN</Link>
         </div>
       </form>
     </div>

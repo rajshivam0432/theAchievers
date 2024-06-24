@@ -1,17 +1,34 @@
 import { Router } from "express";
 // import { upload } from "../middlewares/multer.middlewares.js";
-import { complaint, feedback, rebate} from "../controllers/profile.controllers.js";
-import { verifyJWT } from "../middlewares/auth.middlewares.js";
+import { complaint} from "../controllers/profile.controllers.js";
+import { Complaint } from "../models/complaint.model.js";
+import { Apierror } from "../utils/apierror.js";
+import jwt from 'jsonwebtoken';
 
-const router=Router()
 
-router.route('/complaint').post(
-    verifyJWT,complaint
-)   // http:localhost:4000/api/v1/profile/complaint
 
-router.route('/rebate').post(verifyJWT,rebate)
-//http:localhost:4000/api/v1/profile/rebate 
+const router=Router();
 
-router.route('/feedback').post(verifyJWT,feedback)
+
+
+
+router.route('/complaint').post(complaint)   
+router.route("/complaints").get(async (req, res) => {
+  try {
+    
+    // Fetch complaints associated with the logged-in user
+    const complaints = await Complaint.find({}).lean(); // Use lean() to convert to plain objects
+    console.log("complaints",complaints)
+
+
+    // Modify each complaint object to include useremail
+   
+    console.log("complaintsWithUserEmail",complaints)
+
+    res.status(200).json({ data: complaints }); // Send response with modified complaints
+  } catch (error) {
+    console.error('Error fetching complaints:', error);
+    res.status(500).json({ error: 'Failed to fetch complaints' });
+  }})
 
 export default router
